@@ -1,0 +1,131 @@
+{
+  "_comment": "All keys beginning with '_comment' are comments, they are here to help understand the format of the JSON collection but they can all be removed.",
+  "constants": {
+    "_comment": "The default values for variable parameters",
+    "protocol": "http",
+    "port": "8080",
+    "_comment_customPath": "The customizable path that comes after https://ip_address/",
+    "customPath": "centreon"
+  },
+  "http": {
+    "_comment_requests": "List of the HTTP requests",
+    "requests": [
+      {
+        "_comment_name": "The name will be used to refer to the request",
+        "name": "authenticationRequest",
+        "_comment_hostname": "The hostname must be provided in the command line (e.g. --constant='hostname=127.0.0.1')",
+        "hostname": "%(constants.hostname)",
+        "_comment_proto": "The desired protocol to use (can be 'http' or 'https'). We use the defined constant.",
+        "proto": "%(constants.protocol)",
+        "_comment_port": "The TCP port to connect to. We use the defined constant.",
+        "port": "%(constants.port)",
+        "_comment_endpoint": "The endpoint where the HTTP request must be sent.",
+        "endpoint": "/centreon-map/api/beta/auth/sign-in",
+        "_comment_method": "The method used to query the endpoint. Usually GET to get data or POST to send data such as credentials. ",
+        "method": "POST",
+        "_comment_headers": "If specific headers are required for the request to succeed.",
+        "headers": [
+          "Accept:application/json",
+          "Content-Type:application/json"
+        ],
+        "timeout": 30,
+        "_comment_payload": "The payload is the data sent to the server. Its format depends on what the application is expecting. Here is the format expected by Centreon's login endpoint.",
+        "payload": {
+          "type": "json",
+          "value": {
+                "login": "%(constants.username)",
+                "password": "%(constants.password)"
+          }
+        },
+        "_comment_backend": "It is recommended to use the cURL backend rather than LWP.",
+        "backend": "curl",
+        "_comment_rtype": "Format of the returned content. Handled formats: json, text, xml.",
+        "rtype": "json",
+        "_comment_parse": "List of the parsing rules to extract parts of the data.",
+        "parse": [
+          {
+            "_comment_name": "The name will be used to refer to the parsed data.",
+            "name": "token",
+            "_comment_path": "Path where we will look for the entries.",
+            "path": "$.jwtToken",
+            "_comment_entries": "List of the fields we want to store for each entry.",
+            "entries": [
+              {
+                "id": "value"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "hostsRequest",
+        "hostname": "%(constants.hostname)",
+        "proto": "%(constants.protocol)",
+        "port": "%(constants.port)",
+        "endpoint": "/centreon-map/api/beta/maps/%(constants.map_id)/views/%(constants.view_id)",
+        "method": "GET",
+        "headers": [
+          "Authorization:Bearer %(http.tables.authenticationRequestToken.[0].value)"
+        ],
+        "timeout": 30,
+        "backend": "curl",
+        "rtype": "json",
+        "parse": [
+          {
+            "name": "entries",
+            "type": "body",
+            "path": "$..resourceId",
+            "entries": [
+              {"id": "resourceid"}
+            ]
+          }
+        ]
+      }
+    ]
+},
+  "selection": [
+    {
+      "name": "authenticationSelection",
+      "critical": "defined(%(builtin.httpCode.authenticationRequest)) and %(builtin.httpCode.authenticationRequest) != 200",
+      "formatting": {
+        "printf_msg": "Authentication resulted in %s HTTP code",
+        "printf_var": [
+          "%(builtin.httpCode.authenticationRequest)"
+        ],
+        "display_ok": false
+      }
+    },
+    {
+      "name": "find_host_service_from_id",
+      "functions": [
+        {
+          "type": "count",
+          "src": "%(http.tables.hostsRequestEntries)",
+          "filter": "%(src.resourceid) == %(constants.resource_id)",
+          "save": "%(totalResource)"
+        }
+      ],
+      "perfdatas": [
+        {
+          "nlabel": "resource.count",
+          "value": "%(totalResource)",
+          "warning": "0",
+          "min": 0,
+          "max": "%(totalResource)"
+        }
+      ],
+      "critical": "%(totalResource) <= 0",
+      "formatting": {
+        "printf_msg": "resource : %s",
+        "printf_var": [
+          "%(totalResource)"
+        ],
+        "display_ok": true
+      }
+    }
+  ],
+  "formatting": {
+    "custom_message_global": "Resource found in map view",
+    "separator": "-"
+  }
+}
