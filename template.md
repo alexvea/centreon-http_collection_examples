@@ -42,6 +42,7 @@ Example of the CRITICAL output
 ## Use case ##
 
 Bug : example
+
 Monitoring : example
 
 ## Improvement ## 
