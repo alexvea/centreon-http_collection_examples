@@ -39,3 +39,10 @@ CRITICAL output :
 ````
 CRITICAL: resource : 0 | 'resource.count'=0;0;;0;0
 ````
+## Use case ##
+
+Bug : to check for ressource that disappear suddently on MAP NG
+
+## Improvement ##
+
+This only works if there is no other widgets of same resource id present in the view.
