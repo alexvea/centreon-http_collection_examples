@@ -38,3 +38,12 @@ CRITICAL output :
 ````
 Example of the CRITICAL output
 ````
+
+## Use case ##
+
+Bug : example
+Monitoring : example
+
+## Improvement ## 
+
+List the possible improvement of the json
