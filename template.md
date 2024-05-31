@@ -10,6 +10,9 @@ Here put the description of the json http collection.
 
 Note that for a constant to be usable, you need to add it inside the json like %(constants.CONSTANT_NAME) and on the plugin command like --constant='CONSTANT_NAME=CONSTANT_VALUE'
 
+## Screenshot or json data sample ##
+Here you can put screenshot or the json data
+
 ## Example ##
 ````
 sudo -u centreon-engine /usr/lib/centreon/plugins/centreon_protocol_http.pl --plugin apps::protocols::http::plugin --mode collection --constant='CONSTANT_NAME=CONSTANT_VALUE' --constant='CONSTANT_NAME2=CONSTANT_VALUE2' --constant='CONSTANT_NAME3=CONSTANT_VALUE3' --config /tmp/name_of_collection.json
