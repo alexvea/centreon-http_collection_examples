@@ -1,7 +1,7 @@
 # http_collection_examples
 List of json examples for centreon_protocol_http.pl and mode collection
 
-## Centreon Connector (Plugin + PLugin pack ##
+## Centreon Connector (Plugin + Plugin pack) ##
 https://docs.centreon.com/pp/integrations/plugin-packs/procedures/applications-protocol-http/
 
 ## Tutorial of mode collection ##
